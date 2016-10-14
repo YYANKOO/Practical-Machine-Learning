@@ -1,7 +1,7 @@
 ## Practical Machine Learing Course Project
 ## Abstract
 ###### This report is to predict the manner in which people did the exercise. The data is from accelerometers on the belt, forearm, arm, and dumbbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E). 
-###### In data modeling, the training data is divided into training dataset and validation dataset. The "classe" variable in the training set is the outcome. The validation data is used to validate the model with the expected out-of-sample error rate of less than 1%, or 99% accuracy. The results show that the training model which is build using Random Forest is able to meet the 99% accuracy. Also, it predicts the 20 test cases in the testing data with 100% accuracy.
+###### In data modeling, the training data is divided into training dataset and validation dataset. The "classe" variable in the training set is the outcome. The validation data is used to validate the model with the expected out-of-sample error rate of less than 1%, or 99% accuracy. Three data models are used for model predition: Random Forest, Decision Tree and Generalized Boosted Model. The one with highest accuracy is used to model the testing data. The results show that the training model which is build using Random Forest has the highest accurancy (99.29%). Also, it predicts the 20 test cases in the testing data with 100% accuracy.
 
 ## Data Processing
 * Download and unzipped the data to the working directory.
@@ -62,7 +62,7 @@ train2 <- training[-inTrain, ]
 ```
 
 ## Data Modeling
-###### Random Forests, Decision Tree and Generalized Boosted Model are used for model prediction. The one with highest accuracy will be used to model the testing data.
+###### Random Forest, Decision Tree and Generalized Boosted Model are used for model prediction. The one with highest accuracy will be used to model the testing data.
 #### Random Forest
 ###### Estimate the performance of the model on the training dataset.
 ```{r}
@@ -80,6 +80,7 @@ confusionMatrix(train2$classe, predictRf)
 sampleError <- 1 - as.numeric(confusionMatrix(train2$classe, predictRf)$overall[1])
 sampleError
 ```
+###### The out-of-sample error rate is 0.007136788.
 
 #### Decision Trees
 ###### Estimate the performance of the model on the training dataset.
@@ -96,6 +97,7 @@ confusionMatrix(train2$classe, predictDT)
 sampleErrorDT <- 1 - as.numeric(confusionMatrix(train2$classe, predictDT)$overall[1])
 sampleErrorDT
 ```
+###### The out-of-sample error rate is 0.2684792.
 
 #### Generalized Boosted Model
 ###### Estimate the performance of the model on the training dataset.
@@ -115,6 +117,7 @@ confusionMatrix(predictGBM, train2$classe)
 sampleErrorGBM <- 1 - as.numeric(confusionMatrix(train2$classe, predictGBM)$overall[1])
 sampleErrorGBM
 ```
+###### The out-of-sample error rate is 0.04146134.
 
 #### Conclusion
 ###### The accuracy of the 3 data models are:
@@ -128,8 +131,9 @@ sampleErrorGBM
 ###### Apply the model to the original testing data downloaded from the data source. First, remove the problem_id column . 
 ```{r}
 result <- predict(modelRf, testing[, -length(names(testing))])
-result
+result  
 ```
+###### The result of model predition is B A B A A E D B A A B C B A E E A B B B.
 
 #### Create function to write predictions to files
 ```{r}

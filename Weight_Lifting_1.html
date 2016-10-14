@@ -119,8 +119,8 @@ $(document).ready(function () {
 <div id="this-report-is-to-predict-the-manner-in-which-people-did-the-exercise.-the-data-is-from-accelerometers-on-the-belt-forearm-arm-and-dumbbell-of-6-participants.-they-were-asked-to-perform-barbell-lifts-correctly-and-incorrectly-in-5-different-ways-exactly-according-to-the-specification-class-a-throwing-the-elbows-to-the-front-class-b-lifting-the-dumbbell-only-halfway-class-c-lowering-the-dumbbell-only-halfway-class-d-and-throwing-the-hips-to-the-front-class-e." class="section level6">
 <h6>This report is to predict the manner in which people did the exercise. The data is from accelerometers on the belt, forearm, arm, and dumbbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E).</h6>
 </div>
-<div id="in-data-modeling-the-training-data-is-divided-into-training-dataset-and-validation-dataset.-the-classe-variable-in-the-training-set-is-the-outcome.-the-validation-data-is-used-to-validate-the-model-with-the-expected-out-of-sample-error-rate-of-less-than-1-or-99-accuracy.-the-results-show-that-the-training-model-which-is-build-using-random-forest-is-able-to-meet-the-99-accuracy.-also-it-predicts-the-20-test-cases-in-the-testing-data-with-100-accuracy." class="section level6">
-<h6>In data modeling, the training data is divided into training dataset and validation dataset. The “classe” variable in the training set is the outcome. The validation data is used to validate the model with the expected out-of-sample error rate of less than 1%, or 99% accuracy. The results show that the training model which is build using Random Forest is able to meet the 99% accuracy. Also, it predicts the 20 test cases in the testing data with 100% accuracy.</h6>
+<div id="in-data-modeling-the-training-data-is-divided-into-training-dataset-and-validation-dataset.-the-classe-variable-in-the-training-set-is-the-outcome.-the-validation-data-is-used-to-validate-the-model-with-the-expected-out-of-sample-error-rate-of-less-than-1-or-99-accuracy.-three-data-models-are-used-for-model-predition-random-forest-decision-tree-and-generalized-boosted-model.-the-one-with-highest-accuracy-is-used-to-model-the-testing-data.-the-results-show-that-the-training-model-which-is-build-using-random-forest-has-the-highest-accurancy-99.29.-also-it-predicts-the-20-test-cases-in-the-testing-data-with-100-accuracy." class="section level6">
+<h6>In data modeling, the training data is divided into training dataset and validation dataset. The “classe” variable in the training set is the outcome. The validation data is used to validate the model with the expected out-of-sample error rate of less than 1%, or 99% accuracy. Three data models are used for model predition: Random Forest, Decision Tree and Generalized Boosted Model. The one with highest accuracy is used to model the testing data. The results show that the training model which is build using Random Forest has the highest accurancy (99.29%). Also, it predicts the 20 test cases in the testing data with 100% accuracy.</h6>
 </div>
 </div>
 <div id="data-processing" class="section level2">
@@ -217,8 +217,8 @@ train2 &lt;- training[-inTrain, ]</code></pre>
 </div>
 <div id="data-modeling" class="section level2">
 <h2>Data Modeling</h2>
-<div id="random-forests-decision-tree-and-generalized-boosted-model-are-used-for-model-prediction.-the-one-with-highest-accuracy-will-be-used-to-model-the-testing-data." class="section level6">
-<h6>Random Forests, Decision Tree and Generalized Boosted Model are used for model prediction. The one with highest accuracy will be used to model the testing data.</h6>
+<div id="random-forest-decision-tree-and-generalized-boosted-model-are-used-for-model-prediction.-the-one-with-highest-accuracy-will-be-used-to-model-the-testing-data." class="section level6">
+<h6>Random Forest, Decision Tree and Generalized Boosted Model are used for model prediction. The one with highest accuracy will be used to model the testing data.</h6>
 </div>
 <div id="random-forest" class="section level4">
 <h4>Random Forest</h4>
@@ -301,6 +301,9 @@ confusionMatrix(train2$classe, predictRf)</code></pre>
 sampleError</code></pre>
 <pre><code>## [1] 0.007136788</code></pre>
 </div>
+<div id="the-out-of-sample-error-rate-is-0.007136788." class="section level6">
+<h6>The out-of-sample error rate is 0.007136788.</h6>
+</div>
 </div>
 <div id="decision-trees" class="section level4">
 <h4>Decision Trees</h4>
@@ -347,6 +350,9 @@ confusionMatrix(train2$classe, predictDT)</code></pre>
 <pre class="r"><code>sampleErrorDT &lt;- 1 - as.numeric(confusionMatrix(train2$classe, predictDT)$overall[1])
 sampleErrorDT</code></pre>
 <pre><code>## [1] 0.2684792</code></pre>
+</div>
+<div id="the-out-of-sample-error-rate-is-0.2684792." class="section level6">
+<h6>The out-of-sample error rate is 0.2684792.</h6>
 </div>
 </div>
 <div id="generalized-boosted-model" class="section level4">
@@ -413,6 +419,9 @@ confusionMatrix(predictGBM, train2$classe)</code></pre>
 sampleErrorGBM</code></pre>
 <pre><code>## [1] 0.04146134</code></pre>
 </div>
+<div id="the-out-of-sample-error-rate-is-0.04146134." class="section level6">
+<h6>The out-of-sample error rate is 0.04146134.</h6>
+</div>
 </div>
 <div id="conclusion" class="section level4">
 <h4>Conclusion</h4>
@@ -434,9 +443,12 @@ sampleErrorGBM</code></pre>
 <div id="apply-the-model-to-the-original-testing-data-downloaded-from-the-data-source.-first-remove-the-problem_id-column-." class="section level6">
 <h6>Apply the model to the original testing data downloaded from the data source. First, remove the problem_id column .</h6>
 <pre class="r"><code>result &lt;- predict(modelRf, testing[, -length(names(testing))])
-result</code></pre>
+result  </code></pre>
 <pre><code>##  [1] B A B A A E D B A A B C B A E E A B B B
 ## Levels: A B C D E</code></pre>
+</div>
+<div id="the-result-of-model-predition-is-b-a-b-a-a-e-d-b-a-a-b-c-b-a-e-e-a-b-b-b." class="section level6">
+<h6>The result of model predition is B A B A A E D B A A B C B A E E A B B B.</h6>
 </div>
 <div id="create-function-to-write-predictions-to-files" class="section level4">
 <h4>Create function to write predictions to files</h4>
