@@ -1,0 +1,150 @@
+## Practical Machine Learing Course Project
+## Abstract
+###### This report is to predict the manner in which people did the exercise. The data is from accelerometers on the belt, forearm, arm, and dumbbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E). 
+###### In data modeling, the training data is divided into training dataset and validation dataset. The "classe" variable in the training set is the outcome. The validation data is used to validate the model with the expected out-of-sample error rate of less than 1%, or 99% accuracy. The results show that the training model which is build using Random Forest is able to meet the 99% accuracy. Also, it predicts the 20 test cases in the testing data with 100% accuracy.
+
+## Data Processing
+* Download and unzipped the data to the working directory.
+* Set the current working directory to your working directory. For example, use setwd() function.
+```{r}
+setwd("C:/Users/yyan-koo/Data Science Specification/Courses/Course 8 Machine Learning/Week 4/Assignment/Data")
+```
+
+#### Load the data and library
+```{r}
+library(AppliedPredictiveModeling)
+library(caret)
+library(rattle)
+library(rpart.plot)
+library(randomForest)
+
+training <- read.csv("pml-training.csv") 
+testing <- read.csv("pml-testing.csv")
+dim(training)
+dim(testing)
+```
+###### The training data set contains 19622 observations and 160 variables, while the testing data set contains 20 observations and 160 variables. The "classe" variable in the training set is the outcome to predict.
+
+## Data Cleaning
+#### Remove NA values
+###### Compute the prediction only on the accelerometers values of belt, forearm, arm and dumbell. So, remove the following variables.
+* Have NA or empty values
+* Have nearly zero variance
+* Not contribute to the accelerometer measurements
+```{r}
+# remove variables contain NA missing values.
+training <- training[, colSums(is.na(training)) == 0]   
+testing <- testing[, colSums(is.na(testing)) == 0]      
+
+# remove variables have nearly zero variance 
+nzv <- nearZeroVar(training)    
+training <- training[, -nzv]    
+
+nzv <- nearZeroVar(testing)     
+testing <- testing[, -nzv]
+
+# remove variables do not contribute to the accelerometer measurements.
+training <- training[, -(1:6)]      
+testing <- testing[, -(1:6)]        
+
+dim(training)
+dim(testing)
+```
+###### The cleaned training dataset contains 19622 observations and 53 variables, while the cleaned testing dataset contains 20 observations and 53 variables.
+
+## Data Partitioning
+###### Split the cleaned training set into training dataset (70%) and a validation dataset (30%). The validation dataset is used for cross validation.
+```{r}
+set.seed(123)   # set the seed
+inTrain <- createDataPartition(y=training$classe, p=0.7, list=FALSE)
+train1 <- training[inTrain, ]
+train2 <- training[-inTrain, ]
+```
+
+## Data Modeling
+###### Random Forests, Decision Tree and Generalized Boosted Model are used for model prediction. The one with highest accuracy will be used to model the testing data.
+#### Random Forest
+###### Estimate the performance of the model on the training dataset.
+```{r}
+controlRf <- trainControl(method="cv", 5)     # use 5-fold cross validation
+modelRf <- train(classe ~ ., data=train1, method="rf", trControl=controlRf)      # train the model
+modelRf
+modelRf$finalModel      # show the final model
+```
+
+###### Estimate the performance of the model on the validation dataset. 
+```{r}
+predictRf <- predict(modelRf, train2)
+confusionMatrix(train2$classe, predictRf)
+
+sampleError <- 1 - as.numeric(confusionMatrix(train2$classe, predictRf)$overall[1])
+sampleError
+```
+
+#### Decision Trees
+###### Estimate the performance of the model on the training dataset.
+```{r}
+set.seed(123)
+modelDT <- rpart(classe ~ ., data=train1, method="class")
+```
+
+###### Estimate the performance of the model on the validation dataset.
+```{r}
+predictDT <- predict(modelDT, train2, type="class")
+confusionMatrix(train2$classe, predictDT)
+
+sampleErrorDT <- 1 - as.numeric(confusionMatrix(train2$classe, predictDT)$overall[1])
+sampleErrorDT
+```
+
+#### Generalized Boosted Model
+###### Estimate the performance of the model on the training dataset.
+```{r}
+set.seed(123)
+controlGBM <- trainControl(method = "repeatedcv", number = 5, repeats = 1)
+modelGBM <- train(classe ~ ., data=train1, method = "gbm",
+                    trControl = controlGBM, verbose = FALSE)
+modelGBM$finalModel
+```
+
+###### Estimate the performance of the model on the validation dataset.
+```{r}
+predictGBM <- predict(modelGBM, newdata=train2)
+confusionMatrix(predictGBM, train2$classe)
+
+sampleErrorGBM <- 1 - as.numeric(confusionMatrix(train2$classe, predictGBM)$overall[1])
+sampleErrorGBM
+```
+
+#### Conclusion
+###### The accuracy of the 3 data models are:
+* Random Forest : 0.9929
+* Decision Tree : 0.7315
+* Generalized Boosted Model : 0.9585
+
+###### Among the three data modeling, Random Forest has the highest accurancy. Therefore, it is used to predit the testing data.
+
+## Predicting for Test Data Set
+###### Apply the model to the original testing data downloaded from the data source. First, remove the problem_id column . 
+```{r}
+result <- predict(modelRf, testing[, -length(names(testing))])
+result
+```
+
+#### Create function to write predictions to files
+```{r}
+pml_write_files = function(x){
+  n = length(x)
+  path <- "C:/Users/yyan-koo/Data Science Specification/Courses/Course 8 Machine Learning/Week 4/Assignment/Data"
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=file.path(path, filename),quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+# create prediction files
+pml_write_files(result)
+```
+
+
+
+
